@@ -79,53 +79,53 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-
   uint8_t counter = 0;
-  uint8_t sender, receiver;
+uint8_t sender, receiver;
 
-  /* USER CODE END 2 */
+/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-  /* USER CODE END WHILE */
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+/* USER CODE END WHILE */
 
-	  //receive signal through uart
-	  HAL_UART_Receive_IT(huart2, &receiver, (uint16_t)1);
-	  uint8_t temp = receiver;
+  //receive signal through uart
+  HAL_UART_Receive_IT(&huart2, &receiver, (uint16_t)1u);
+  uint8_t temp = receiver;
 
-	  if(temp / 8 == 1)
-		  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-	  else
-		  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-	  temp %= 8;
+  if(temp / 8 == 1)
+	  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+  else
+	  HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
+  temp %= 8;
 
-	  if(temp / 4 == 1)
-		  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
-	  else
-		  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-	  temp %= 4;
+  if(temp / 4 == 1)
+	  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+  else
+	  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
+  temp %= 4;
 
-	  if(temp / 2 == 1)
-		  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
-	  else
-		  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
-	  temp %= 2;
+  if(temp / 2 == 1)
+	  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
+  else
+	  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
+  temp %= 2;
 
-	  if(temp == 1)
-		  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_SET);
-	  else
-		  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
+  if(temp == 1)
+	  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_SET);
+  else
+	  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
 
-	  //send signal through uart
-	  sender = counter;
-	  HAL_UART_Transmit_IT(huart2, &sender, (uint16_t)1);
+  //send signal through uart
+  sender = counter;
+  HAL_UART_Transmit_IT(&huart2, &sender, (uint16_t)1u);
 
-	  counter++;
-	  counter %= 15;
+  counter++;
+  counter %= 15;
 
-	  HAL_Delay(500u);
+  HAL_Delay(500u);
+
   /* USER CODE BEGIN 3 */
 
   }
