@@ -32,6 +32,7 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "dma.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -64,6 +65,12 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
+  HAL_StatusTypeDef rx_status = HAL_ERROR;
+  HAL_StatusTypeDef tx_status = HAL_ERROR;
+  uint8_t i = 0;
+  uint8_t rx_data[10] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10 };
+  uint8_t tx_data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -76,68 +83,62 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
 
-  HAL_StatusTypeDef rx_status = HAL_ERROR;
-  HAL_StatusTypeDef tx_status = HAL_ERROR;
+  rx_status = HAL_UART_Receive_DMA(&huart2, rx_data, 10);
+  if(rx_status == HAL_OK)
+  {
+	  tx_status = HAL_UART_Transmit_DMA(&huart2, tx_data, 10);
+	  if(tx_status == HAL_OK)
+	  {
+		  MX_USART2_UART_Init();
+	  }
+  }
 
-  uint8_t rx_data[10];
-  uint8_t tx_data[10];
+  /* USER CODE END 2 */
 
-  tx_data[0] = 0;
-
-	/* USER CODE END 2 */
-
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		tx_data[0]++;
-		tx_data[0] %= 16;
-
-		tx_status = HAL_UART_Transmit(&huart2, tx_data, 1, 1000);
-
-		if(tx_status == HAL_OK)
+		i %= 10;
+		if(tx_data[i] == rx_data[i])
 		{
-			rx_status = HAL_UART_Receive(&huart2, rx_data, 1, 1000);
-			if(rx_status == HAL_OK)
-			{
-				if(tx_data[0] == rx_data[0])
-				{
-					uint8_t temp = tx_data[0];
-					if(temp / 8 == 1)
-						HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-					else
-						HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-					temp %= 8;
+			uint8_t temp = rx_data[i];
+			if(temp / 8 == 1)
+				HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+			else
+				HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
+			temp %= 8;
 
-					if(temp / 4 == 1)
-						HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
-					else
-						HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-					temp %= 4;
+			if(temp / 4 == 1)
+				HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+			else
+				HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
+			temp %= 4;
 
-					if(temp / 2 == 1)
-						HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
-					else
-						HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
-					temp %= 2;
+			if(temp / 2 == 1)
+				HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
+			else
+				HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
+			temp %= 2;
 
-					if(temp == 1)
-						HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_SET);
-					else
-						HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
-				}
-			}
+			if(temp == 1)
+				HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_SET);
+			else
+				HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
+
+			i++;
 		}
 
 		HAL_Delay(500u);
 	}
-	/* USER CODE END WHILE */
+  /* USER CODE END WHILE */
 
-	/* USER CODE BEGIN 3 */
+  /* USER CODE BEGIN 3 */
 
   /* USER CODE END 3 */
 
